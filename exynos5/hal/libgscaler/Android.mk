@@ -26,8 +26,7 @@ LOCAL_STATIC_LIBRARIES := libsecurepath
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/include \
-	$(TOP)/hardware/samsung_slsi/exynos/libexynosutils
+	$(LOCAL_PATH)/../libexynosutils
 
 LOCAL_SRC_FILES := exynos_gscaler.c
 

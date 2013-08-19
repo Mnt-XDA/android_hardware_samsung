@@ -22,8 +22,7 @@ LOCAL_SHARED_LIBRARIES := liblog libutils libcutils libexynosutils libexynosv4l2
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/include \
-	$(TOP)/hardware/samsung_slsi/exynos/libexynosutils
+	$(LOCAL_PATH)/../libexynosutils
 
 LOCAL_SRC_FILES := exynos_rotator.c
 

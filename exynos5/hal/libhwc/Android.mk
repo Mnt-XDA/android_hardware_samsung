@@ -30,7 +30,7 @@ ifeq ($(BOARD_USES_HWC_SERVICES),true)
 ifeq ($(BOARD_USES_WFD),true)
 	LOCAL_CFLAGS += -DUSES_WFD
 	LOCAL_SHARED_LIBRARIES += libfimg
-	LOCAL_C_INCLUDES += $(TOP)/hardware/samsung_slsi/exynos/libfimg4x
+	LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libfimg4x
 endif
 
 ifeq ($(BOARD_USE_S3D_SUPPORT),true)
@@ -63,16 +63,14 @@ LOCAL_CFLAGS += -DLOG_TAG=\"hwcomposer\"
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/include \
-	$(TOP)/hardware/samsung_slsi/exynos/libexynosutils \
-	$(TOP)/hardware/samsung_slsi/$(TARGET_SOC)/include \
-	$(TOP)/hardware/samsung_slsi/$(TARGET_SOC)/libhwcmodule \
-	$(TOP)/hardware/samsung_slsi/$(TARGET_BOARD_PLATFORM)/libcec
+	$(LOCAL_PATH)/../libexynosutils \
+	$(LOCAL_PATH)/../libcec \
+	$(TOP)/hardware/samsung/$(TARGET_BOARD_PLATFORM)/$(TARGET_SOC)/libhwcmodule
 
 ifeq ($(BOARD_USE_GRALLOC_FLAG_FOR_HDMI),true)
 	LOCAL_CFLAGS += -DUSE_GRALLOC_FLAG_FOR_HDMI
 	LOCAL_SHARED_LIBRARIES += libfimg
-	LOCAL_C_INCLUDES += $(TOP)/hardware/samsung_slsi/exynos/libfimg4x
+	LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libfimg4x
 endif
 
 LOCAL_SRC_FILES := ExynosHWC.cpp

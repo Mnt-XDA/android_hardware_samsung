@@ -23,12 +23,12 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/libexynosutils
+	$(LOCAL_PATH)/../libexynosutils
 
 LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libutils \
-	libexynosutils 
+	libexynosutils
 
 LOCAL_MODULE := libexynosv4l2
 LOCAL_PRELINK_MODULE := false

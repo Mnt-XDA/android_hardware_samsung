@@ -17,9 +17,9 @@ EXYNOS_OMX_INC := $(EXYNOS_OMX_TOP)/include
 EXYNOS_OMX_COMPONENT := $(EXYNOS_OMX_TOP)/component
 
 EXYNOS_VIDEO_CODEC := \
-	hardware/samsung_slsi/$(TARGET_BOARD_PLATFORM)/libcodec/video
+	hardware/samsung/$(TARGET_BOARD_PLATFORM)/hal/libcodec/video
 EXYNOS_AUDIO_CODEC := \
-	hardware/samsung_slsi/$(TARGET_BOARD_PLATFORM)/libcodec/audio
+	hardware/samsung/$(TARGET_BOARD_PLATFORM)/hal/libcodec/audio
 
 include $(EXYNOS_OMX_TOP)/osal/Android.mk
 include $(EXYNOS_OMX_TOP)/core/Android.mk

@@ -8,10 +8,10 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
-	$(TOP)/hardware/samsung_slsi/exynos/include
+	$(TOP)/hardware/samsung/$(TARGET_BOARD_PLATFORM)/hal/include
 
 ifeq ($(BOARD_USE_KHRONOS_OMX_HEADER), true)
-LOCAL_C_INCLUDES += $(TOP)/hardware/samsung_slsi/openmax/include/khronos
+LOCAL_C_INCLUDES += $(TOP)/hardware/samsung/$(TARGET_BOARD_PLATFORM)/hal/openmax/include/khronos
 else
 LOCAL_C_INCLUDES += $(TOP)/frameworks/native/include/media/openmax
 endif

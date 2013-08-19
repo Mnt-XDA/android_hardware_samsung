@@ -30,11 +30,10 @@ LOCAL_SRC_FILES	+= 	\
 	sec_g2ddrm.cpp
 
 LOCAL_C_INCLUDES += \
-	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/include
+	$(LOCAL_PATH)/../include
 
 LOCAL_SHARED_LIBRARIES += libMcClient
 
-include hardware/samsung_slsi/$(TARGET_SOC)/mobicore/common/LogWrapper/Android.mk
+include $(LOCAL_PATH)/../mobicore/common/LogWrapper/Android.mk
 
 include $(BUILD_STATIC_LIBRARY)

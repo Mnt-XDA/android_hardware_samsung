@@ -26,13 +26,11 @@ LOCAL_CFLAGS += -DHWC_SERVICES
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../include \
-	$(TOP)/hardware/samsung_slsi/exynos/include \
-	$(TOP)/hardware/samsung_slsi/exynos/libexynosutils \
-	$(TOP)/hardware/samsung_slsi/$(TARGET_SOC)/include \
-	$(TOP)/hardware/samsung_slsi/$(TARGET_SOC)/libhwcmodule
+	$(LOCAL_PATH)/../libexynosutils \
+	$(TOP)/hardware/samsung/$(TARGET_BOARD_PLATFORM)/$(TARGET_SOC)/libhwcmodule
 
 LOCAL_C_INCLUDES += \
-       $(LOCAL_PATH)/../libhwc
+	$(LOCAL_PATH)/../libhwc
 
 LOCAL_SRC_FILES := ExynosHWCService.cpp IExynosHWC.cpp
 
