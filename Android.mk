@@ -14,6 +14,12 @@
 
 SAM_ROOT := $(call my-dir)
 
+# Exynos 5
+ifeq ($(TARGET_BOARD_PLATFORM),exynos5)
+ifeq ($(TARGET_SOC),exynos5410)
+include $(SAM_ROOT)/exynos5410.mk
+endif
+endif
 # Exynos 4
 ifeq ($(TARGET_BOARD_PLATFORM),exynos4)
 ifeq ($(TARGET_SOC),exynos4210)

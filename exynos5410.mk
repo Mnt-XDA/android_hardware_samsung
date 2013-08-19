@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2013 The CyanogenMod Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
 ifeq ($(TARGET_BOARD_PLATFORM),exynos5)
-
-target_dirs := \
-	hal
-
-ifeq ($(TARGET_SOC),exynos5250)
-target_dirs += \
-	exynos5250
-endif
 ifeq ($(TARGET_SOC),exynos5410)
-target_dirs += \
-	exynos5410
+
+include $(SAM_ROOT)/exynos5/Android.mk
+
 endif
-
-include $(call all-named-subdir-makefiles,$(target_dirs))
-
 endif

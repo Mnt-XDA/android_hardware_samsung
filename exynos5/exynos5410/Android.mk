@@ -14,20 +14,11 @@
 # limitations under the License.
 #
 
-ifeq ($(TARGET_BOARD_PLATFORM),exynos5)
-
-target_dirs := \
-	hal
-
-ifeq ($(TARGET_SOC),exynos5250)
-target_dirs += \
-	exynos5250
-endif
 ifeq ($(TARGET_SOC),exynos5410)
-target_dirs += \
-	exynos5410
-endif
 
-include $(call all-named-subdir-makefiles,$(target_dirs))
+exynos5410_dirs := \
+	libhwcmodule
+
+include $(call all-named-subdir-makefiles,$(exynos5410_dirs))
 
 endif
