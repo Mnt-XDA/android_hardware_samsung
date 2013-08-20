@@ -366,14 +366,14 @@ struct exynos5_hwc_composer_device_1_t {
     struct sec_rect         saved_layer_for_external[4];
     int                     saved_layer_count;
     bool                    is_change_external_surface;
-    private_handle_t        *prev_handle_external_surfaces[5];
-    private_handle_t        *prev_handle_flexible_surfaces[5];
+    IMG_native_handle_t        *prev_handle_external_surfaces[5];
+    IMG_native_handle_t        *prev_handle_flexible_surfaces[5];
     bool                    already_mapped_vfb;
     int                     vfb_fd;
     int                     surface_fd_for_vfb[NUM_BUFFER_U4A];  /* for ubuntu */
     int                     num_of_ext_vfb_layer;
     struct FB_TARGET_Info   fb_target_info[NUM_FB_TARGET];
-    private_handle_t        *prev_handle_vfb;
+    IMG_native_handle_t        *prev_handle_vfb;
 #endif
 
     int  is_fb_layer;

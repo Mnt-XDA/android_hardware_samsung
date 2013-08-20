@@ -22,11 +22,13 @@
 static void exynos5_cleanup_gsc_m2m(exynos5_hwc_composer_device_1_t *pdev,
         size_t gsc_idx);
 
-static void dump_handle(private_handle_t *h)
+#if 0
+static void dump_handle(IMG_native_handle_t *h)
 {
     ALOGV("\t\tformat = %d, width = %u, height = %u, stride = %u, vstride = %u",
             h->format, h->width, h->height, h->stride, h->vstride);
 }
+#endif
 
 static void dump_layer(hwc_layer_1_t const *l)
 {
@@ -43,8 +45,10 @@ static void dump_layer(hwc_layer_1_t const *l)
             l->displayFrame.right,
             l->displayFrame.bottom);
 
+#if 0
     if(l->handle && !(l->flags & HWC_SKIP_LAYER))
-        dump_handle(private_handle_t::dynamicCast(l->handle));
+        dump_handle(IMG_native_handle_t::dynamicCast(l->handle));
+#endif
 }
 
 static void dump_config(s3c_fb_win_config &c)
@@ -321,7 +325,7 @@ static bool exynos5_supports_gscaler(hwc_layer_1_t &layer, int format,
         bool local_path)
 #endif
 {
-    private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
 
     int max_w = is_rotated(layer) ? 2048 : 4800;
     int max_h = is_rotated(layer) ? 2048 : 3344;
@@ -446,8 +450,8 @@ bool hdmi_is_preset_supported(struct exynos5_hwc_composer_device_1_t *dev, int p
 static void wfd_output(buffer_handle_t buf, exynos5_hwc_composer_device_1_t *pdev,
         exynos5_gsc_data_t *gsc, hwc_layer_1_t &layer)
 {
-    private_handle_t *src_handle = private_handle_t::dynamicCast(layer.handle);
-    private_handle_t *handle = private_handle_t::dynamicCast(buf);
+    IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(buf);
 
     if (pdev->wfd_skipping) {
         pdev->wfd_skipping--;
@@ -466,7 +470,7 @@ static void wfd_output(buffer_handle_t buf, exynos5_hwc_composer_device_1_t *pde
         gsc->dst_cfg.releaseFenceFd = -1;
     }
     gsc->current_buf = (gsc->current_buf + 1) % NUM_GSC_DST_BUFS;
-    private_handle_t *next_h = private_handle_t::dynamicCast(gsc->dst_buf[gsc->current_buf]);
+    IMG_native_handle_t *next_h = IMG_native_handle_t::dynamicCast(gsc->dst_buf[gsc->current_buf]);
     if (next_h->fd == pdev->wfd_locked_fd)
         gsc->current_buf = (gsc->current_buf + 1) % NUM_GSC_DST_BUFS;
 }
@@ -633,7 +637,7 @@ static unsigned int formatValueHAL2G2D(int hal_format,
 }
 
 int runCompositor(exynos5_hwc_composer_device_1_t *pdev,
-        hwc_layer_1_t &src_layer, private_handle_t *dst_handle,
+        hwc_layer_1_t &src_layer, IMG_native_handle_t *dst_handle,
         uint32_t transform, uint32_t global_alpha, unsigned long solid,
         blit_op mode, bool force_clear, unsigned long srcAddress, unsigned long dstAddress)
 {
@@ -673,7 +677,7 @@ int runCompositor(exynos5_hwc_composer_device_1_t *pdev,
     bool src_ion_mapped = false;
     bool dst_ion_mapped = false;
 
-    private_handle_t *src_handle = private_handle_t::dynamicCast(src_layer.handle);
+    IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(src_layer.handle);
 
     if (!force_clear) {
         srcImgRect = {src_layer.sourceCrop.left, src_layer.sourceCrop.top,
@@ -877,7 +881,7 @@ static buffer_handle_t *exynos5_external_layer_composite(exynos5_hwc_composer_de
             pdev->composite_buf_width  = pdev->hdmi_w;
             pdev->composite_buf_height = pdev->hdmi_h;
             buffer_handle_t dst_buf = pdev->composite_buffer_for_external[i];
-            private_handle_t *dst_handle = private_handle_t::dynamicCast(dst_buf);
+            IMG_native_handle_t *dst_handle = IMG_native_handle_t::dynamicCast(dst_buf);
             pdev->va_composite_buffer_for_external[i]
                 = (unsigned long)ion_map(dst_handle->fd, pdev->composite_buf_width * pdev->composite_buf_height * 4, 0);
             ALOGD("composite_buffer_for_external[%d] ion_mapped address: 0x%08x\n", i, pdev->va_composite_buffer_for_external[i]);
@@ -885,11 +889,11 @@ static buffer_handle_t *exynos5_external_layer_composite(exynos5_hwc_composer_de
     }
 
     buffer_handle_t dst_buf = pdev->composite_buffer_for_external[buf_index];
-    private_handle_t *dst_handle = private_handle_t::dynamicCast(dst_buf);
+    IMG_native_handle_t *dst_handle = IMG_native_handle_t::dynamicCast(dst_buf);
 
     unsigned long srcAddr = 0;
     if (src_layer.compositionType == HWC_FRAMEBUFFER_TARGET) {
-        private_handle_t *src_handle = private_handle_t::dynamicCast(src_layer.handle);
+        IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(src_layer.handle);
         srcAddr = get_mapped_addr_fb_target(pdev, src_handle->fd);
     }
 
@@ -1074,7 +1078,7 @@ static void hdmi_disable(struct exynos5_hwc_composer_device_1_t *dev)
 static int hdmi_output(struct exynos5_hwc_composer_device_1_t *dev,
                        hdmi_layer_t &hl,
                        hwc_layer_1_t &layer,
-                       private_handle_t *h,
+                       IMG_native_handle_t *h,
                        int acquireFenceFd,
                        int *releaseFenceFd)
 {
@@ -1482,7 +1486,7 @@ bool exynos5_supports_overlay(hwc_layer_1_t &layer, size_t i,
         return false;
     }
 
-    private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
 
     if (!handle) {
         ALOGV("\tlayer %u: handle is NULL", i);
@@ -1568,9 +1572,9 @@ static inline bool yuv_cfg_changed(video_layer_config &c1, video_layer_config &c
 static bool exynos5_compare_yuvlayer_config(hwc_layer_1_t &layer,
         video_layer_config *pre_src_data, video_layer_config *pre_dst_data)
 {
-    private_handle_t *src_handle = private_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(layer.handle);
     buffer_handle_t dst_buf;
-    private_handle_t *dst_handle;
+    IMG_native_handle_t *dst_handle;
     int ret = 0;
     bool reconfigure = 1;
 
@@ -1684,7 +1688,7 @@ static int exynos5_prepare_fimd(exynos5_hwc_composer_device_1_t *pdev,
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
         if (layer.handle) {
-            private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
             if (exynos5_get_drmMode(handle->flags) != NO_DRM) {
                 ALOGV("included protected layer, should use GSC M2M");
                 goto retry;
@@ -1700,7 +1704,7 @@ static int exynos5_prepare_fimd(exynos5_hwc_composer_device_1_t *pdev,
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
         if (layer.handle) {
-            private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
             if (exynos5_format_is_supported_gsc_local(handle->format) &&
                 (pdev->gsc[FIMD_GSC_IDX].gsc_mode != exynos5_gsc_map_t::GSC_M2M)) {
                 if ((layer.flags & HWC_SKIP_LAYER) ||
@@ -1732,7 +1736,7 @@ retry:
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
         if (layer.handle) {
-            private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
             if (exynos5_get_drmMode(handle->flags) != NO_DRM) {
                 contents_has_drm_surface = true;
                 popup_drm_lay_idx = i;
@@ -1765,7 +1769,7 @@ retry:
         }
 
         if (layer.handle) {
-            private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
 
             /* external surfaces should not use overlay */
 #ifdef USE_GRALLOC_FLAG_FOR_HDMI
@@ -1880,7 +1884,7 @@ retry:
                     layer.compositionType == HWC_FRAMEBUFFER_TARGET)
                 continue;
 
-            private_handle_t *handle = private_handle_t::dynamicCast(
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(
                     layer.handle);
 
             // we've already accounted for the framebuffer above
@@ -1968,7 +1972,7 @@ retry:
 
 #ifdef FORCEFB_YUVLAYER
         if (layer.handle) {
-            private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
             if (exynos5_format_is_supported_gsc_local(handle->format)) {
                 /* in case of changing compostiontype form GSC to FRAMEBUFFER for yuv layer */
                 if ((pdev->configmode == 1) && (layer.compositionType == HWC_FRAMEBUFFER)) {
@@ -1987,8 +1991,8 @@ retry:
             ALOGV("assigning layer %u to window %u", i, nextWindow);
             pdev->bufs.overlay_map[nextWindow] = i;
             if (layer.compositionType == HWC_OVERLAY) {
-                private_handle_t *handle =
-                        private_handle_t::dynamicCast(layer.handle);
+                IMG_native_handle_t *handle =
+                        IMG_native_handle_t::dynamicCast(layer.handle);
                 if (exynos5_requires_gscaler(layer, handle->format)) {
 #ifdef HWC_SERVICES
                     if (pdev->hdmi_hpd && (exynos5_get_drmMode(handle->flags) == SECURE_DRM)
@@ -2066,7 +2070,7 @@ retry:
     pdev->saved_layer_count = 0;
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
-        private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+        IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
 
         /* save EXTERNAL_FLEXIBLE surface`s displayFrame geometry, it will be used to display HDMI */
         if (h && (h->flags & GRALLOC_USAGE_EXTERNAL_FLEXIBLE)) {
@@ -2104,9 +2108,9 @@ static int exynos5_config_gsc_localout(exynos5_hwc_composer_device_1_t *pdev,
 {
     ALOGV("configuring gscaler %u for memory-to-fimd-localout", gsc_idx);
 
-    private_handle_t *src_handle = private_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(layer.handle);
     buffer_handle_t dst_buf;
-    private_handle_t *dst_handle;
+    IMG_native_handle_t *dst_handle;
     int ret = 0;
 
     exynos_gsc_img src_cfg, dst_cfg;
@@ -2242,7 +2246,7 @@ static int exynos5_prepare_hdmi(exynos5_hwc_composer_device_1_t *pdev,
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
         if (layer.handle) {
-            private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
 
             if ((h->flags & GRALLOC_USAGE_EXTERNAL_ONLY) ||
 #if defined(GSC_VIDEO)
@@ -2290,7 +2294,7 @@ static int exynos5_prepare_hdmi(exynos5_hwc_composer_device_1_t *pdev,
         }
 
         if (layer.handle) {
-            private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
             /*
              * Note: The following sections enclosed in the macro GSC_VIDEO may or may
              *       not be modified/removed at a later time
@@ -2535,7 +2539,7 @@ static int exynos5_prepare_wfd(exynos5_hwc_composer_device_1_t *pdev,
         }
 
         if (layer.handle) {
-            private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
 
             if ((exynos5_get_drmMode(h->flags) != NO_DRM) && (h->flags & GRALLOC_USAGE_EXTERNAL_DISP) &&
 #ifdef SUPPORT_GSC_LOCAL_PATH
@@ -2629,9 +2633,9 @@ static int exynos5_config_gsc_m2m(hwc_layer_1_t &layer,
     ALOGV("configuring gscaler %u for memory-to-memory", AVAILABLE_GSC_UNITS[gsc_idx]);
 
     alloc_device_t* alloc_device = pdev->alloc_device;
-    private_handle_t *src_handle = private_handle_t::dynamicCast(layer.handle);
+    IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(layer.handle);
     buffer_handle_t dst_buf;
-    private_handle_t *dst_handle;
+    IMG_native_handle_t *dst_handle;
     int ret = 0;
 #if USES_WFD
     int wfd_w = ALIGN(pdev->wfd_w, EXYNOS5_WFD_OUTPUT_ALIGNMENT);
@@ -2761,7 +2765,7 @@ static int exynos5_config_gsc_m2m(hwc_layer_1_t &layer,
              if (dst_format == EXYNOS5_WFD_FORMAT && !src_cfg.drmMode) {
                  /* Default color will be black */
                  char * uv_addr;
-                 dst_handle = private_handle_t::dynamicCast(gsc_data->dst_buf[i]);
+                 dst_handle = IMG_native_handle_t::dynamicCast(gsc_data->dst_buf[i]);
                  uv_addr = (char *)ion_map(dst_handle->fd1, w * h / 2, 0);
                  memset(uv_addr, 0x7f, w * h / 2);
              }
@@ -2800,7 +2804,7 @@ static int exynos5_config_gsc_m2m(hwc_layer_1_t &layer,
 #endif
 
     dst_buf = gsc_data->dst_buf[gsc_data->current_buf];
-    dst_handle = private_handle_t::dynamicCast(dst_buf);
+    dst_handle = IMG_native_handle_t::dynamicCast(dst_buf);
 
     if(gsc_idx == HDMI_GSC_IDX) {
         dst_cfg.fw = pdev->hdmi_w;
@@ -2911,7 +2915,7 @@ static void exynos5_cleanup_gsc_m2m(exynos5_hwc_composer_device_1_t *pdev,
         gsc_data.dst_buf_fence[i] = -1;
 }
 
-static void exynos5_config_handle(private_handle_t *handle,
+static void exynos5_config_handle(IMG_native_handle_t *handle,
         hwc_rect_t &sourceCrop, hwc_rect_t &displayFrame,
         int32_t blending, int fence_fd, s3c_fb_win_config &cfg,
         exynos5_hwc_composer_device_1_t *pdev)
@@ -3010,7 +3014,7 @@ static void exynos5_config_overlay(hwc_layer_1_t *layer, s3c_fb_win_config &cfg,
         layer->acquireFenceFd = -1;
     }
 #endif
-    private_handle_t *handle = private_handle_t::dynamicCast(layer->handle);
+    IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer->handle);
     exynos5_config_handle(handle, layer->sourceCrop, layer->displayFrame,
             layer->blending, layer->acquireFenceFd, cfg, pdev);
 }
@@ -3030,8 +3034,8 @@ static int exynos5_post_fimd(exynos5_hwc_composer_device_1_t *pdev,
         int layer_idx = pdata->overlay_map[i];
         if (layer_idx != -1) {
             hwc_layer_1_t &layer = contents->hwLayers[layer_idx];
-            private_handle_t *handle =
-                    private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *handle =
+                    IMG_native_handle_t::dynamicCast(layer.handle);
 
             if (pdata->gsc_map[i].mode == exynos5_gsc_map_t::GSC_M2M) {
                 int gsc_idx = pdata->gsc_map[i].idx;
@@ -3065,8 +3069,8 @@ static int exynos5_post_fimd(exynos5_hwc_composer_device_1_t *pdev,
                 }
 
                 buffer_handle_t dst_buf = gsc.dst_buf[gsc.current_buf];
-                private_handle_t *dst_handle =
-                        private_handle_t::dynamicCast(dst_buf);
+                IMG_native_handle_t *dst_handle =
+                        IMG_native_handle_t::dynamicCast(dst_buf);
                 int fence = gsc.dst_cfg.releaseFenceFd;
                 exynos5_config_handle(dst_handle, sourceCrop,
                         layer.displayFrame, layer.blending, fence, config[i],
@@ -3293,7 +3297,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
             } else {
 #endif
 #if defined(GSC_VIDEO)
-                private_handle_t *handle = private_handle_t::dynamicCast(layer.handle);
+                IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(layer.handle);
                 if ((int)get_yuv_planes(HAL_PIXEL_FORMAT_2_V4L2_PIX(handle->format)) < 0 &&
                         !(handle->flags & GRALLOC_USAGE_EXTERNAL_FLEXIBLE) &&
                         !(handle->flags & GRALLOC_USAGE_EXTERNAL_ONLY) &&
@@ -3330,7 +3334,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                 }
             }
 #endif
-            private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+            IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
 
 #if defined(GSC_VIDEO)
             if ((exynos5_get_drmMode(h->flags) == SECURE_DRM) || (h->flags & GRALLOC_USAGE_EXTERNAL_DISP)) {
@@ -3347,7 +3351,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                 }
 
                 buffer_handle_t dst_buf = gsc.dst_buf[gsc.current_buf];
-                private_handle_t *h = private_handle_t::dynamicCast(dst_buf);
+                IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(dst_buf);
 
                 int acquireFenceFd = gsc.dst_cfg.releaseFenceFd;
                 int releaseFenceFd = -1;
@@ -3380,7 +3384,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                         ALOGE("FBIOGET_VSCREENINFO ioctl failed: %s", strerror(errno));
 #endif
 
-                    private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+                    IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
                     hwc_layer_1_t dst_layer;
                     dst_layer.displayFrame.left = 0;
                     dst_layer.displayFrame.right = pdev->hdmi_w;
@@ -3412,7 +3416,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                 if (pdev->is_change_external_surface) {
                     if (video_layer) {
                         /* if subtitle , it use directyly use fb layer */
-                        private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+                        IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
                         hdmi_output(pdev, pdev->hdmi_layers[1], layer, h, layer.acquireFenceFd,
                                 &layer.releaseFenceFd);
                         fb_layer = &layer;
@@ -3423,7 +3427,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                             need_clear_composite_buffer = false;
                         }
                         dst_buf = exynos5_external_layer_composite(pdev, layer, pdev->composite_buf_index, clear);
-                        private_handle_t *dst_h = private_handle_t::dynamicCast(*dst_buf);
+                        IMG_native_handle_t *dst_h = IMG_native_handle_t::dynamicCast(*dst_buf);
 
                         hwc_layer_1_t dst_layer;
                         dst_layer.displayFrame.left = 0;
@@ -3448,7 +3452,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                         need_clear_composite_buffer = false;
                     }
                     dst_buf = exynos5_external_layer_composite(pdev, layer, pdev->composite_buf_index, clear);
-                    private_handle_t *dst_h = private_handle_t::dynamicCast(*dst_buf);
+                    IMG_native_handle_t *dst_h = IMG_native_handle_t::dynamicCast(*dst_buf);
 
                     hwc_layer_1_t dst_layer;
                     dst_layer.displayFrame.left = 0;
@@ -3488,7 +3492,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                 /* in case of 1080P30,  memcpy to tempbuffer, and then render that */
                 dst_buf = exynos5_external_layer_composite(pdev, layer, pdev->composite_buf_index, false);
                 layer.releaseFenceFd = layer.acquireFenceFd;
-                private_handle_t *dst_h = private_handle_t::dynamicCast(*dst_buf);
+                IMG_native_handle_t *dst_h = IMG_native_handle_t::dynamicCast(*dst_buf);
                 hwc_layer_1_t dst_layer;
                 dst_layer.displayFrame.left = 0;
                 dst_layer.displayFrame.right = pdev->hdmi_w;
@@ -3499,7 +3503,7 @@ static int exynos5_set_hdmi(exynos5_hwc_composer_device_1_t *pdev,
                 use_composite_buffer_for_external = true;
             } else {
 #endif
-                private_handle_t *h = private_handle_t::dynamicCast(layer.handle);
+                IMG_native_handle_t *h = IMG_native_handle_t::dynamicCast(layer.handle);
                 hdmi_output(pdev, pdev->hdmi_layers[1], layer, h, layer.acquireFenceFd,
                             &layer.releaseFenceFd);
 #ifdef USE_GRALLOC_FLAG_FOR_HDMI
@@ -3582,7 +3586,7 @@ static int exynos5_set_wfd(exynos5_hwc_composer_device_1_t *pdev,
 
     for (size_t i = 0; i < contents->numHwLayers; i++) {
         hwc_layer_1_t &layer = contents->hwLayers[i];
-        private_handle_t *src_handle = private_handle_t::dynamicCast(layer.handle);
+        IMG_native_handle_t *src_handle = IMG_native_handle_t::dynamicCast(layer.handle);
 
         if (layer.flags & HWC_SKIP_LAYER) {
             ALOGV("WFD skipping layer %d", i);
@@ -3615,7 +3619,7 @@ static int exynos5_set_wfd(exynos5_hwc_composer_device_1_t *pdev,
         overlay_layer = overlay_layer == NULL? target_layer : overlay_layer;
         if (pdev->wfd_sleepctrl && pdev->wfd_blanked) {
             buffer_handle_t dst_buf = gsc.dst_buf[gsc.current_buf];
-            private_handle_t *handle = private_handle_t::dynamicCast(dst_buf);
+            IMG_native_handle_t *handle = IMG_native_handle_t::dynamicCast(dst_buf);
 
             pdev->wfd_enabled = false;
             runCompositor(pdev, *overlay_layer, handle, 0, 0xff, 0xff000000,
